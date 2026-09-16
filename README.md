@@ -1,161 +1,139 @@
 # DDCOS — Data-Driven Commerce Optimization System
 
-DDCOS is a full-stack commerce intelligence application that combines inventory management, event analytics, demand modeling and ML-assisted price optimization in one dashboard.
+> A full-stack commerce intelligence platform that combines demand forecasting, ML-based dynamic pricing, inventory management, customer-event analytics, simulation, and revenue optimization in a single dashboard.
 
-## What it does
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue)](https://ddcos-commerce-optimization-system.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI-green)](https://ddcos-commerce-optimization-system.onrender.com/docs)
+[![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-61DAFB)](https://react.dev/)
+[![Database](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
+[![ML](https://img.shields.io/badge/ML-scikit--learn-orange)](https://scikit-learn.org/)
 
-- **Dashboard:** KPIs, revenue/demand trends, top products and business insights.
-- **Inventory:** Create, edit, search, filter, sort and delete products.
-- **Pricing:** Run ML price optimization, inspect predicted demand/revenue, elasticity, candidate-price simulation and Monte Carlo risk.
-- **Analytics:** Revenue, sales, product performance and revenue distribution.
-- **Simulation:** Generate realistic observed price/demand history on demand.
-- **Model training:** Train a separate demand model for each product from historical observations.
-- **API:** FastAPI + SQLAlchemy with Swagger documentation and health checks.
+---
 
-## Architecture
+## 🚀 Live Application
 
-```text
-React + TypeScript + Tailwind + Recharts
-                 │
-                 │ REST / JSON
-                 ▼
-        FastAPI application
-                 │
-       ┌─────────┴─────────┐
-       ▼                   ▼
-   SQLAlchemy          ML service
-       │                   │
- SQLite / PostgreSQL   scikit-learn
-```
+**Frontend:**  
+https://ddcos-commerce-optimization-system.vercel.app
 
-## Local setup
+**Backend API:**  
+https://ddcos-commerce-optimization-system.onrender.com
 
-### 1. Backend
+**Swagger API Documentation:**  
+https://ddcos-commerce-optimization-system.onrender.com/docs
 
-```bash
-cd backend
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-copy .env.example .env   # Windows
-# cp .env.example .env   # macOS/Linux
-python seed_demo.py
-uvicorn main:app --reload
-```
+---
 
-API: `http://127.0.0.1:8000`  
-Swagger: `http://127.0.0.1:8000/docs`  
-Health: `http://127.0.0.1:8000/health`
+## 📌 Overview
 
-### 2. Frontend
+DDCOS (Data-Driven Commerce Optimization System) is a full-stack commerce optimization platform designed to help businesses make data-driven decisions around:
 
-```bash
-cd frontend
-npm install
-copy .env.example .env   # Windows
-# cp .env.example .env   # macOS/Linux
-npm run dev
-```
+- Product pricing
+- Demand estimation
+- Inventory management
+- Customer behavior
+- Revenue analysis
+- Pricing risk
+- Revenue optimization
 
-Open the Vite URL shown in the terminal, normally `http://localhost:5173`.
+The system uses historical price-demand observations to train product-specific machine learning models and then evaluates multiple candidate prices to identify the price that maximizes predicted revenue.
 
-## Environment variables
+The application also includes simulation and Monte Carlo analysis to study pricing outcomes under uncertainty.
 
-### Backend `.env`
+---
 
-```env
-DATABASE_URL=sqlite:///./ddcos.db
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-SQL_ECHO=false
-```
+## ✨ Key Features
 
-For production, replace `DATABASE_URL` with a PostgreSQL/Neon connection string and set `CORS_ORIGINS` to the deployed frontend URL.
+### 📊 Business Dashboard
 
-### Frontend `.env`
+- Revenue KPIs
+- Sales metrics
+- Demand trends
+- Average product price
+- Top-performing products
+- Customer-event statistics
+- Business insights
 
-```env
-VITE_API_URL=http://127.0.0.1:8000
-```
+### 📦 Inventory Management
 
-## ML approach
+- Add products
+- Update product information
+- Update prices
+- Delete products
+- Search products
+- Sort and filter inventory
+- Track stock levels
 
-The training pipeline groups observations by product and trains a product-specific **Linear Regression** demand model using historical price → demand observations. Training returns R², MSE and RMSE metrics. The optimizer evaluates a dense price grid around the current price and selects the price with the highest predicted revenue.
+### 💰 ML-Based Pricing Optimization
 
-The optimizer also provides:
+For each product, the system can:
 
-- price-demand simulation
-- demand elasticity
-- Monte Carlo revenue uncertainty
-- P10/P90 revenue estimates
+- Train a demand model
+- Estimate demand at different prices
+- Simulate price-demand relationships
+- Calculate predicted revenue
+- Search for revenue-maximizing prices
+- Estimate demand elasticity
+- Analyze pricing uncertainty
 
-Predicted optimization results are deliberately **not** written back as observed training data. This prevents prediction leakage into the historical dataset.
+### 🤖 Machine Learning
 
-## API overview
+The training pipeline:
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Service/database health |
-| GET/POST | `/products/` | List/create products |
-| GET/PUT/DELETE | `/products/{id}` | Read/update/delete product |
-| PUT | `/products/{id}/price` | Update only price |
-| GET/POST | `/events/` | Customer events |
-| GET | `/dashboard/` | Dashboard KPIs and trends |
-| GET | `/analytics/` | Full analytics payload |
-| POST | `/optimize/price` | ML price optimization |
-| GET/POST | `/price-history/` | Historical observations |
-| POST | `/simulation/run` | One simulation cycle |
-| POST | `/simulation/run-multiple` | Multiple cycles |
-| POST | `/train/` | Train models |
-| GET | `/train/status` | Model status |
+1. Groups historical observations by product.
+2. Uses historical price and demand data.
+3. Trains a separate Linear Regression model for each product.
+4. Evaluates the models using:
+   - R²
+   - MSE
+   - RMSE
+5. Uses the trained models during price optimization.
 
-## Deployment
+### 🎲 Monte Carlo Risk Analysis
 
-### Backend — Render
+The pricing optimizer also provides uncertainty analysis using Monte Carlo simulation.
 
-The repository includes `render.yaml`. Configure `DATABASE_URL` and `CORS_ORIGINS` in Render. Use the backend directory as the service root.
+It estimates:
 
-### Frontend — Vercel
+- Expected revenue
+- Revenue distribution
+- P10 revenue
+- P90 revenue
+- Pricing risk
 
-The repository includes `frontend/vercel.json` for React Router history fallback. Set `VITE_API_URL` to the deployed backend URL before building.
+### 📈 Analytics
 
-## Smoke test
+The analytics module provides:
 
-After installing backend dependencies and starting from `backend`:
+- Revenue trends
+- Sales analysis
+- Product performance
+- Revenue distribution
+- Demand-related metrics
 
-```bash
-PYTHONPATH=. python smoke_test.py
-```
+### 🧪 Data Simulation
 
-## Project structure
+DDCOS includes a simulation engine that generates realistic historical price-demand observations and customer events.
+
+This makes it possible to demonstrate the complete ML pipeline without requiring a real production commerce dataset.
+
+---
+
+# 🏗️ System Architecture
 
 ```text
-ddcos-commerce-optimization-system/
-├── backend/
-│   ├── app/
-│   │   ├── database/
-│   │   ├── ml/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── schemas/
-│   │   └── services/
-│   ├── main.py
-│   ├── seed_demo.py
-│   ├── smoke_test.py
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── services/
-│   ├── package.json
-│   └── vercel.json
-└── render.yaml
-```
-
-## Notes
-
-- SQLite is the zero-configuration local default.
-- PostgreSQL is supported for deployment.
-- No database password is hardcoded in the application.
-- Automatic database-writing background simulation is disabled; simulation is explicit so data does not grow unexpectedly.
+                    React + TypeScript
+                           │
+                           │ REST API
+                           ▼
+                  ┌─────────────────┐
+                  │     FastAPI     │
+                  │   REST Backend  │
+                  └────────┬────────┘
+                           │
+             ┌─────────────┼─────────────┐
+             │             │             │
+             ▼             ▼             ▼
+        SQLAlchemy      ML Service    API Routes
+             │             │
+             ▼             ▼
+       PostgreSQL      scikit-learn
