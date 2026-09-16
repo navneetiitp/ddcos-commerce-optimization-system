@@ -1,0 +1,4 @@
+from app.services.train_service import train_model
+
+if __name__ == "__main__":
+    print(train_model())
