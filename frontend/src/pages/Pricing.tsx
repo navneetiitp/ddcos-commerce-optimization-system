@@ -313,55 +313,60 @@ export default function Pricing() {
       Apply Optimized Price
   ------------------------------ */
 
-  async function handleApply() {
-
+async function handleApply() {
   if (!selectedProduct || !result) return;
 
   setApplying(true);
 
   try {
-
-    // Save optimized price in database
-    const updatedProduct =
-      await updateProductPrice(
-        selectedProduct.id,
-        result.optimal_price
-      );
+    const updatedProduct = await updateProductPrice(
+      selectedProduct.id,
+      result.optimal_price
+    );
 
     if (!updatedProduct) {
-
       alert("Failed to update price.");
-
       return;
-
     }
 
-    // Refresh products from backend
-    await loadProducts();
+    // Get predicted demand from optimization result
+    const predictedDemand =
+      result.predicted_demand ??
+      result.simulation?.find(
+        (item: any) => item.price === result.optimal_price
+      )?.demand ??
+      0;
 
-    // Close modal
+    // Update frontend state without reloading products
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === selectedProduct.id
+          ? {
+              ...product,
+              price: result.optimal_price,
+              optimized: true,
+              optimizedPrice: result.optimal_price,
+              predictedDemand,
+              predictedRevenue: result.expected_revenue,
+            }
+          : product
+      )
+    );
+
     setModalOpen(false);
-
-    // Clear optimization result
     setResult(null);
-
     setSelectedProduct(null);
 
     alert("✅ Product price updated successfully!");
 
   } catch (err) {
-
     console.error(err);
-
     alert("Something went wrong.");
-
   } finally {
-
     setApplying(false);
-
   }
-
 }
+
     return (
     <div className="p-6 text-white">
 
